@@ -785,7 +785,7 @@ Answer these in **bullet points** (max 1 page total):
 
 1. **Frontend stack choice**
 
-### Frontend stack choice
+
 
 - **Framework:** Next.js (React)
 - **State management:** React Query (server state) + lightweight local state via React hooks
@@ -803,7 +803,7 @@ Answer these in **bullet points** (max 1 page total):
 
 2. **API layer design**
 
-### API layer design
+
 
 - **HTTP client:** Axios (with interceptors)
 - **Typed client:** Generated via OpenAPI when available
@@ -821,7 +821,7 @@ Answer these in **bullet points** (max 1 page total):
 
 3. **Browser caching plan**
 
-### Browser caching plan
+
 
 **What to cache**
 - GET API responses (jobs, drafts, templates, characters)
@@ -846,12 +846,12 @@ Answer these in **bullet points** (max 1 page total):
 - Show last-updated timestamp
 
 ---
-  `
-  <EDIT YOUR ANSWER HERE>`
+  
+ 
 
 4. **Debugging & observability**
 
-### Debugging & observability
+
 
 **Error boundaries**
 - Wrap major routes and async components
@@ -886,7 +886,7 @@ Answer these in **bullet points** (max 1 page total):
 
 5. **Security basics**
 
-### Security basics
+
 
 **Token storage**
 - Prefer HttpOnly secure cookies when possible
