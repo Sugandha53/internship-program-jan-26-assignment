@@ -220,7 +220,194 @@ The UI clearly communicates the async job lifecycle.
 
 **Your Solution for problem 2:**
 
-You need to put your solution here.
+### Screens
+
+**1. Connect Screen**
+- “Connect LinkedIn” CTA button
+- OAuth authorization flow trigger
+- Connection status indicator (Connected / Not Connected)
+- Reconnect option if token expired
+- Security note about permissions
+
+**Purpose:** Securely connect user’s LinkedIn account before automation.
+
+---
+
+**2. Persona Editor Screen**
+- Form inputs:
+  - Background / Experience (textarea)
+  - Preferred tone (dropdown)
+  - Language style (dropdown)
+  - Do’s and Don’ts (textarea)
+- Save and Update buttons
+- Live preview snippet (optional)
+- Validation errors inline
+
+**Purpose:** One-time persona setup to maintain consistent voice.
+
+---
+
+**3. Drafts Screen (3 Variants)**
+- Topic input + optional context fields
+- “Generate Posts” button
+- Loading skeleton while generating
+- Display 3 draft cards side-by-side:
+  - Style label (Insight / Story / Checklist)
+  - Character count
+  - Copy button
+  - Select button
+- Regenerate option
+
+**Purpose:** Allow user to compare and choose best variant.
+
+---
+
+**4. Approval Screen**
+- Selected draft preview (editable optional)
+- Warning: “You are about to publish”
+- Two actions:
+  - Post Now
+  - Schedule Post
+- Back to drafts option
+
+**Purpose:** Explicit human approval before publishing.
+
+---
+
+**5. Scheduler Screen**
+- Date picker
+- Time picker
+- Timezone selector (auto-detected default)
+- Validation for past time
+- Schedule confirmation summary
+- Success toast after scheduling
+
+**Purpose:** Reliable future publishing with timezone safety.
+
+---
+
+**6. Post History Screen**
+- Paginated table of posts
+- Status badges:
+  - Draft
+  - Approved
+  - Scheduled
+  - Published
+  - Failed
+- Posted timestamp
+- Retry button for failed posts
+- Filter by status
+
+**Purpose:** Visibility and control over automation outcomes.
+
+---
+
+### Form UX
+
+**Persona Validation**
+- Required fields: background, tone, language style
+- Character limits with live counter
+- Prevent empty persona submission
+- Save button disabled until valid
+- Auto-save draft locally (optional)
+
+**Topic Input Rules**
+- Minimum character requirement
+- Optional audience/goal fields
+- Show helpful placeholder examples
+- Prevent generation if topic empty
+
+**Scheduling Guardrails**
+- Prevent selecting past date/time
+- Show timezone clearly
+- Confirmation modal before scheduling
+- Warn if LinkedIn not connected
+- Prevent duplicate scheduling clicks
+
+---
+
+### API Calling Strategy
+
+**Draft Generation Flow**
+- User clicks Generate → `POST /posts/generate`
+- Show loading skeleton
+- Receive 3 variants in response
+- Store in local state
+
+**Optimistic vs Strict Confirmation**
+- Use strict confirmation for publishing (safer)
+- No optimistic publish for LinkedIn actions
+- Show success only after server confirms
+
+**Approval & Publish**
+- Approve → `POST /posts/approve`
+- Immediate publish → `POST /posts/publish`
+- Scheduled publish → `POST /posts/schedule`
+
+**Error Handling**
+- Normalize API errors
+- Retry generation failures (max 2 retries)
+- Show user-friendly error messages
+- Disable buttons during in-flight requests
+
+**Abort Handling**
+- Cancel draft generation if user navigates away
+- Use AbortController for cleanup
+
+---
+
+### Caching Strategy
+
+**What to Cache**
+- Generated drafts (short-term)
+- Persona configuration
+- Post history list
+
+**Where**
+- React Query in-memory cache
+- localStorage for persona persistence
+- IndexedDB optional for offline draft safety
+
+**TTL**
+- Drafts: short (~10 minutes)
+- Persona: long (~7 days)
+- Post history: medium (~60 seconds)
+
+**Refetch Triggers**
+- After approval or publish
+- After scheduling
+- Manual refresh in history screen
+- Window focus refetch (optional)
+
+---
+
+### Debugging & Observability
+
+**User-visible Failure States**
+- Clear error banner for failed publishing
+- Show failure reason if available
+- Retry action for failed posts
+
+**Logging**
+- Capture generation failures
+- Capture publish/schedule errors
+- Include requestId/jobId in logs
+
+**Support-friendly Details**
+- Show postId in history
+- Include timestamp and status transitions
+- “Report issue” action with payload
+
+**Network Monitoring**
+- Track LinkedIn auth failures
+- Detect token expiration
+- Surface rate-limit responses gracefully
+
+**Error Boundaries**
+- Wrap drafts and scheduler flows
+- Prevent full page crash
+- Log unexpected UI failures
+
 
 ---
 
