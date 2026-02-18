@@ -785,30 +785,127 @@ Answer these in **bullet points** (max 1 page total):
 
 1. **Frontend stack choice**
 
-* EDIT YOUR ANSWER HERE: Framework (Next.js/Vue/etc), state management, router, UI kit, why.
-  `<EDIT YOUR ANSWER HERE>`
+### Frontend stack choice
+
+- **Framework:** Next.js (React)
+- **State management:** React Query (server state) + lightweight local state via React hooks
+- **Routing:** Next.js App Router
+- **UI Kit:** Tailwind CSS + shadcn/ui components
+
+**Why:**
+- Next.js provides excellent performance and routing
+- React Query simplifies async state and caching
+- Tailwind enables rapid, consistent UI development
+- shadcn/ui provides accessible production-ready components
+- Scales well for async-heavy dashboards
+
+---
 
 2. **API layer design**
 
-* Fetch/Axios choice, typed client generation (OpenAPI), error normalization, retries, request dedupe, abort controllers.
-  `
-  <EDIT YOUR ANSWER HERE>`
+### API layer design
+
+- **HTTP client:** Axios (with interceptors)
+- **Typed client:** Generated via OpenAPI when available
+- **Error normalization:** Central error handler maps API errors to user-friendly messages
+- **Retries:** Automatic retry for idempotent GET requests (max 2 retries)
+- **Request dedupe:** React Query deduplication for identical requests
+- **Abort controllers:** Used for upload cancel, polling cleanup, and navigation safety
+
+**Design principles:**
+- No silent failures
+- Consistent error surface
+- Safe cancellation of long requests
+
+---
 
 3. **Browser caching plan**
 
-* What you cache (GET responses, derived state), where (memory, IndexedDB, localStorage), TTL/invalidation rules.
-* How you handle “job status updates” without stale UI.
+### Browser caching plan
+
+**What to cache**
+- GET API responses (jobs, drafts, templates, characters)
+- Derived UI state where helpful
+- Static metadata
+
+**Where**
+- In-memory via React Query (primary)
+- localStorage for lightweight persistence
+- IndexedDB optional for heavy offline data
+
+**TTL / invalidation**
+- Active jobs: short TTL (~15–30s)
+- Metadata: medium (~5–60 min)
+- Completed results: long (~24h)
+- Manual refresh always available
+
+**Avoiding stale job status**
+- Active jobs always polled from server
+- Cache bypass during processing
+- Background refetch on window focus
+- Show last-updated timestamp
+
+---
   `
   <EDIT YOUR ANSWER HERE>`
 
 4. **Debugging & observability**
 
-* Error boundaries, client-side logging approach, correlation id propagation, “report a problem” payload.
-* How you would debug: slow uploads, failed downloads, intermittent 500s.
-  `
-  <EDIT YOUR ANSWER HERE>`
+### Debugging & observability
+
+**Error boundaries**
+- Wrap major routes and async components
+- Graceful fallback UI
+- Capture runtime crashes
+
+**Client-side logging**
+- Structured logs in development
+- Capture API failures and unexpected states
+- Ready for remote logging integration (e.g., Sentry)
+
+**Correlation ID propagation**
+- Display jobId/requestId in UI
+- Include in logs and support payloads
+- Helps trace backend issues
+
+**Report a problem**
+- One-click user report
+- Includes:
+  - jobId
+  - last status
+  - client environment
+  - recent errors
+
+**Debugging playbook**
+- Slow uploads → check network + chunk progress
+- Failed downloads → verify signed URL + expiry
+- Intermittent 500s → inspect retries + correlation ID
+
+---
+
 
 5. **Security basics**
 
-* Token storage approach, CSRF considerations (if cookies), XSS avoidance for markdown rendering, safe file download patterns.
-  ` A<EDIT YOUR ANSWER HERE>`
+### Security basics
+
+**Token storage**
+- Prefer HttpOnly secure cookies when possible
+- If using JWT in browser → store in memory (not localStorage)
+- Auto-refresh tokens safely
+
+**CSRF**
+- Use SameSite cookies
+- CSRF token validation for sensitive actions
+- Avoid unsafe cross-origin requests
+
+**XSS protection**
+- Sanitize markdown rendering
+- Avoid dangerouslySetInnerHTML
+- Use trusted markdown renderer
+- Escape user-generated content
+
+**Safe file downloads**
+- Use signed URLs with expiry
+- Validate file ownership server-side
+- Prevent open redirect issues
+- Disable inline execution of downloaded files
