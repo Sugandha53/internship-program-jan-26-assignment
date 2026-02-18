@@ -611,7 +611,171 @@ The UI clearly communicates the async job lifecycle.
 
 **Your Solution for problem 4:**
 
-You need to put your solution here.
+### Screens
+
+**1. Character Library Screen**
+- Grid/list of saved characters
+- Character card with avatar, name, role
+- Add Character button
+- Edit/Delete actions
+- Search and filter
+- Version badge on each character
+
+**Purpose:** Central source of truth for reusable characters across episodes.
+
+---
+
+**2. Relationship Editor Screen**
+- Visual graph or table of relationships
+- Relationship type selector (friend, rival, mentor, etc.)
+- Add/Edit/Delete relationship
+- Conflict warning if inconsistent rules
+- Save changes CTA
+
+**Purpose:** Maintain behavioral consistency between characters.
+
+---
+
+**3. Episode Creator Screen**
+- Story prompt textarea
+- Character multi-select (from library)
+- Episode tone selector (comedy, drama, etc.)
+- Duration target (~5 minutes)
+- Language selector
+- Narration vs dialogue ratio slider
+- Generate Episode button
+- Validation before submission
+
+**Purpose:** Configure and trigger new episode generation.
+
+---
+
+**4. Episode Detail Screen**
+- Episode status badge
+- Generation progress timeline
+- Scene-by-scene script viewer
+- Regenerate scene option
+- Resume generation (if interrupted)
+- Version badge for episode
+- Download package button
+
+**Purpose:** Deep visibility into long-running generation and outputs.
+
+---
+
+**5. Asset Gallery Screen**
+- Scene-wise asset grouping
+- Character visuals preview
+- Background assets
+- Audio plan preview
+- Thumbnail lazy loading
+- Download individual assets
+
+**Purpose:** Easy inspection and reuse of generated assets.
+
+---
+
+### Consistency UX
+
+**Locked Character Profile**
+- Once used in an episode, show “Locked” badge
+- Prevent accidental personality changes
+- Allow versioned edits only
+- Show warning if user attempts breaking changes
+
+**Version Badges**
+- Version number on characters and episodes
+- Show “updated after episode creation” warning
+- Allow viewing previous versions
+- Maintain audit trail
+
+**Relationship Safety**
+- Validate incompatible relationships
+- Warn if selected cast violates rules
+- Maintain series bible integrity
+
+---
+
+### API Calling Strategy
+
+**Episode Generation Flow**
+- User submits → `POST /episodes/generate`
+- Backend returns `jobId`
+- Frontend redirects to Episode Detail
+
+**Progress Tracking (Polling)**
+- Poll `GET /episodes/{jobId}` every 5–10 seconds
+- Show step-wise progress
+- Stop polling on success/failed
+- Use exponential backoff on failures
+
+**Resume Support**
+- If user refreshes, resume using jobId
+- Persist active job in localStorage
+- Restore progress UI on return
+
+**Abort Handling**
+- Cancel polling on navigation
+- Use AbortController cleanup
+- Prevent duplicate generation requests
+
+**Error Handling**
+- Normalize API errors
+- Retry transient failures
+- Show actionable user messages
+
+---
+
+### Caching Strategy
+
+**Character Library Caching**
+- Cache character list in React Query
+- TTL ~5 minutes
+- Invalidate on character edit/add/delete
+- Prefetch on app load
+
+**Episode Package Caching**
+- Cache completed episode metadata
+- TTL long (~24 hours)
+- Bypass cache while job is processing
+- Manual refresh option
+
+**Asset Thumbnail Caching**
+- Browser HTTP cache + lazy loading
+- IndexedDB optional for heavy assets
+- Use low-res preview first
+- Prevent re-downloading unchanged assets
+
+**Stale Data Protection**
+- Always refetch active jobs
+- Use background refresh on focus
+- Show last-updated timestamp
+
+---
+
+### Long-Running Job UX
+
+**Progress Experience**
+- Multi-step progress indicator
+- Estimated time remaining (if available)
+- Background processing friendly
+- Allow safe navigation away
+
+**Resilience**
+- Auto-reconnect polling on network loss
+- Resume after page refresh
+- Preserve job state locally
+
+**Failure Handling**
+- Clear failure reason
+- Retry generation CTA
+- Preserve previous logs for debugging
+
+**Observability**
+- Show jobId prominently
+- Capture client-side errors
+- Provide “Report issue” with payload
+
 
 ---
 
