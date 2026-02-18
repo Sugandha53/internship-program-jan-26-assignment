@@ -26,7 +26,183 @@
 
 **Your Solution for problem 1:**
 
-You need to put your solution here.
+### Screens
+
+**1. Upload Screen**
+- Video file upload input (drag & drop + file picker)
+- File validation (type, size >200MB supported)
+- Upload progress bar with percentage and speed
+- Submit button (disabled during upload)
+- Error message area
+- Success redirect to Jobs List after upload
+
+**Purpose:** Allow user to upload large videos and start async processing safely.
+
+---
+
+**2. Jobs List Screen**
+- Paginated list of all submitted jobs
+- Status badge (Queued / Processing / Success / Failed)
+- Created time and video name
+- Click row to open Job Detail
+- Retry button for failed jobs
+- Manual refresh option
+
+**Purpose:** Provide centralized tracking of all video processing jobs.
+
+---
+
+**3. Job Detail Screen**
+- Prominent jobId / correlation ID
+- Current status with visual indicator
+- Step-wise processing logs/timeline
+- Progress indicator while running
+- Retry and Cancel (if supported)
+- Link to Results when ready
+
+**Purpose:** Deep visibility into async job lifecycle and debugging support.
+
+---
+
+**4. Results Screen**
+- Render Summary.md using safe markdown viewer
+- Highlights list with timestamps (click-to-seek)
+- Assets preview (clips and screenshots)
+- Download all assets button
+- Processed timestamp display
+
+**Purpose:** Enable quick 5–10 minute consumption of long video content.
+
+---
+
+### UI States
+
+The UI clearly communicates the async job lifecycle.
+
+**Loading**
+- Shown during video upload
+- Progress bar with percentage and speed
+- Submit disabled to prevent duplicate uploads
+
+**Queued**
+- Status badge: "Queued"
+- Inform user job is waiting for processing
+- Safe to navigate away
+
+**Processing**
+- Animated spinner/progress
+- Step-wise logs (e.g., extracting audio, generating summary)
+- Live status updates via polling
+- JobId visible for debugging
+
+**Success**
+- Green success badge
+- Link to Results screen enabled
+- Show processed timestamp
+
+**Failed**
+- Red error state with human-readable message
+- Retry button available
+- Preserve job metadata
+
+**Retry**
+- Show retry-in-progress state
+- Disable repeated clicks
+- Maintain previous logs for traceability
+
+**Partial Output**
+- Show available highlights/screenshots if ready
+- Mark remaining items as "processing…"
+- Improves perceived performance
+
+---
+
+### API Calling Plan
+
+**Upload Flow**
+- User uploads via `POST /videos/upload`
+- Backend returns `jobId` and initial status
+- Frontend redirects to Jobs List
+
+**Job Progress Tracking (Polling)**
+- Poll `GET /jobs/{jobId}` every 5–10 seconds
+- Continue while status is `queued` or `processing`
+- Stop automatically on `success` or `failed`
+- Use exponential backoff on repeated failures
+
+**Abort Handling**
+- Use AbortController to cancel polling on navigation/unmount
+- Prevent unnecessary network usage and memory leaks
+
+**Error Handling**
+- Normalize API errors
+- Show user-friendly messages
+- Auto-retry failed polling requests (max 3 retries)
+- Surface persistent failures in UI
+
+**Pagination**
+- Jobs list fetched via paginated API
+- Example: `GET /jobs?page=1&limit=10`
+- Prevents large payload rendering
+
+---
+
+### Caching Strategy
+
+**What to Cache**
+- Jobs list responses
+- Individual job detail
+- Final results metadata
+
+**Where to Cache**
+- In-memory cache via React Query for active session
+- localStorage for lightweight job metadata
+- IndexedDB optional for larger offline-friendly data
+
+**TTL Strategy**
+- Jobs list: ~30 seconds
+- Job detail: ~15 seconds during processing
+- Results: ~24 hours (mostly immutable)
+
+**Cache Invalidation**
+- Invalidate job detail on retry
+- Refresh jobs list after new upload
+- Invalidate when job transitions to success
+- Provide manual refresh option
+
+**Fresh Job Status Handling**
+- While polling, bypass stale cache
+- Always prefer latest server state for active jobs
+
+---
+
+### Debugging & Observability
+
+**Correlation ID Visibility**
+- Display jobId prominently in Job Detail
+- Enables backend traceability
+- Helps debug “stuck processing”
+
+**Network Monitoring**
+- Log API failures with status codes
+- Surface meaningful errors to user
+- Enable easy inspection via browser DevTools
+
+**Client-side Logging**
+- Capture upload failures, polling errors, unexpected states
+- Structured logs in development
+- Support remote logging integration in production
+
+**Error Boundaries**
+- Wrap major UI sections with React Error Boundaries
+- Show graceful fallback UI
+- Log crash details for investigation
+
+**User Support Hooks**
+- Provide optional “Report a Problem”
+- Include jobId, last status, and client logs
+- Helps support team debug intermittent failures
+
 
 ---
 
