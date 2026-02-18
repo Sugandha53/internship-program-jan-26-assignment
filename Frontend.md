@@ -425,7 +425,176 @@ The UI clearly communicates the async job lifecycle.
 
 **Your Solution for problem 3:**
 
-You need to put your solution here.
+### Screens
+
+**1. Template Upload Screen**
+- DOCX upload (drag & drop + file picker)
+- File validation (type, size limits)
+- Upload progress indicator
+- Template name input
+- Success redirect to Field Review
+
+**Purpose:** Allow user to upload and register reusable DOCX templates.
+
+---
+
+**2. Field Review / Editor Screen**
+- Auto-detected field list from template
+- Field type selector (text / number / date / currency)
+- Required toggle
+- Default value input
+- Inline validation errors
+- Add/remove field option
+- Save template button
+- Template preview (read-only)
+
+**Purpose:** Let user confirm and configure dynamic fields accurately.
+
+---
+
+**3. Single Fill Form Screen**
+- Dynamic form generated from field schema
+- Field-wise validation
+- Real-time error messages
+- Generate button (disabled until valid)
+- Output format selector (DOCX / PDF)
+- Generation loading state
+
+**Purpose:** Generate one document quickly with correct validation.
+
+---
+
+**4. Bulk Upload Screen**
+- Download sample CSV/Excel template
+- CSV/XLSX upload input
+- File validation (size, format)
+- Optional column mapping UI
+- Row count preview
+- Start Bulk Run button
+
+**Purpose:** Enable large-scale document generation.
+
+---
+
+**5. Bulk Run Status Screen**
+- Job progress bar (% complete)
+- Processed rows counter
+- Live status updates
+- Partial success indicator
+- Cancel (if supported)
+- Background processing notice
+
+**Purpose:** Provide visibility into long-running bulk jobs.
+
+---
+
+**6. Report Table Screen**
+- Paginated per-row results
+- Status badge (Success / Failed)
+- Error reason column
+- Search and filter
+- Export report option
+
+**Purpose:** Clear audit trail for bulk generation.
+
+---
+
+**7. Downloads Screen**
+- ZIP download button
+- Individual file downloads
+- File naming preview
+- Expiry notice for signed URLs
+- Download progress indicator
+
+**Purpose:** Safe and predictable access to generated outputs.
+
+---
+
+### Field UI
+
+**Supported Field Types**
+- Text
+- Number
+- Date
+- Currency
+- Optional blocks (future-ready)
+
+**Validation Rules**
+- Required field enforcement
+- Type-specific validation
+- Inline error messaging
+- Character limits where applicable
+- Default value support
+
+**UX Enhancements**
+- Auto-focus on first invalid field
+- Tooltip help for field meaning
+- Consistent formatting preview
+
+---
+
+### Bulk UX
+
+**CSV Upload Constraints**
+- Accept CSV/XLSX only
+- File size limit enforcement
+- Header validation against template fields
+- Show row count before processing
+
+**Mapping UI (Optional)**
+- Auto-map matching column names
+- Manual dropdown mapping fallback
+- Highlight unmapped required fields
+
+**Progress & Partial Success**
+- Show real-time progress bar
+- Display processed vs total rows
+- Allow partial success completion
+- Provide clear failure reasons per row
+
+---
+
+### Browser Caching Strategy
+
+**What to Cache**
+- Template metadata
+- Field schema definitions
+- Bulk report pages
+
+**Where**
+- React Query in-memory cache
+- localStorage for recent templates
+- IndexedDB optional for large reports
+
+**TTL**
+- Template metadata: long (~24 hours)
+- Field schema: long (~24 hours)
+- Bulk reports: medium (~2 minutes per page)
+
+**Invalidation**
+- After template update
+- After new bulk run
+- Manual refresh option
+
+---
+
+### Downloads (Safe UX)
+
+**Signed URL Flow**
+- Request download via secure endpoint
+- Receive time-limited signed URL
+- Prevent direct public file access
+
+**Download Experience**
+- Show download progress
+- Disable repeated clicks
+- Handle expired links gracefully
+- Retry option on failure
+
+**Security Considerations**
+- Validate file ownership
+- Prevent open redirect risks
+- Sanitize file names
 
 ---
 
